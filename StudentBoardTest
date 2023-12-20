@@ -1,0 +1,311 @@
+import student.micro.*;
+import static org.assertj.core.api.Assertions.*;
+import student.tetris2.*;
+/**
+ *  Tests the methods of the StudentBoard class to ensure that 
+ *  the class is implemented correctly. 
+ *
+ *  @author Prakhar Pandey (prakhar28)
+ *  @version (2023.04.10)
+ */
+public class StudentBoardTest
+    extends TestCase
+{
+    /**
+     * Creates a new StudentBoardTest test object.
+     */
+    public StudentBoardTest()
+    {
+        // The constructor is usually empty in unit tests, since it runs
+        // once for the whole class, not once for each test method.
+        // Per-test initialization should be placed in setUp() instead.
+    }
+
+    /**
+     * tests the constructor and makes sure all the fields are
+     * correctly intialized. 
+     */
+    public void testConstructor()
+    {
+        StudentBoard board = new StudentBoard(10, 20);
+        int width = board.getWidth();
+        int height = board.getHeight();
+        int[] columnHeights = board.getColumnHeights();
+        int[] blocksInAllRows = board.getBlocksInAllRows();
+        boolean[][] grid = board.getGrid();
+
+        assertThat(width).isEqualTo(10);
+        assertThat(height).isEqualTo(20);
+        assertThat(columnHeights).containsOnly(0);
+        assertThat(blocksInAllRows).containsOnly(0);
+        assertThat(grid).isEqualTo(new boolean[20][10]);
+    }
+
+    /**
+     * tests the hasBlockAt() method with a valid block
+     */
+    public void testHasBlockAtValidBlock()
+    {
+        StudentBoard board = BoardUtilities.newBoard(StudentBoard.class,
+                10, 24, 
+                "#### #####"
+            );
+
+        boolean value1 = board.hasBlockAt(new Point(0, 0));
+        boolean value2 = board.hasBlockAt(new Point(4, 3));
+        boolean value3 = board.hasBlockAt(new Point(7, 2));
+        boolean value4 = board.hasBlockAt(new Point(9, 3));
+
+        assertThat(value1).isTrue();
+        assertThat(value2).isFalse();
+        assertThat(value3).isFalse();
+        assertThat(value4).isFalse();
+    }
+
+    /**
+     * tests the hasBlockAt() method at a valid empty spot
+     */
+    public void testHasBlockAtValidEmptySpot()
+    {
+        StudentBoard board = BoardUtilities.newBoard(StudentBoard.class,
+                10, 24, 
+                "#### #####"
+            );
+
+        boolean value1 = board.hasBlockAt(new Point(0, 3));
+        boolean value2 = board.hasBlockAt(new Point(3, 0));
+        boolean value3 = board.hasBlockAt(new Point(8, 2));
+        boolean value4 = board.hasBlockAt(new Point(9, 0));
+
+        assertThat(value1).isFalse();
+        assertThat(value2).isTrue();
+        assertThat(value3).isFalse();
+        assertThat(value4).isTrue();
+    }
+
+    /**
+     * tests the hasBlockAt() method at an invalid spot
+     */
+    public void testHasBlockAtInvalidSpot()
+    {
+        StudentBoard board = BoardUtilities.newBoard(StudentBoard.class,
+                10, 24, 
+                "#### #####"
+            );
+
+        boolean value1 = board.hasBlockAt(new Point(-1, 0));
+        boolean value2 = board.hasBlockAt(new Point(10, 3));
+        boolean value3 = board.hasBlockAt(new Point(5, -1));
+        boolean value4 = board.hasBlockAt(new Point(6, 24));
+
+        assertThat(value1).isTrue();
+        assertThat(value2).isTrue();
+        assertThat(value3).isTrue();
+        assertThat(value4).isTrue();
+    }
+
+    /**
+     * tests the place() method when the selected location is 
+     * out of bounds with a negative X value. 
+     */
+    public void testPlaceOutOfBoundsWithNegativeX()
+    {
+        StudentBoard board = BoardUtilities.newBoard(StudentBoard.class, 
+            5, 5, 
+            "", "", "", "", ""
+            );
+        
+        Piece piece = Piece.getPiece(Piece.SQUARE, 0);
+        int result = board.place(piece, new Point(-1, 0));
+        
+        assertThat(result).isEqualTo(Board.PLACE_OUT_BOUNDS);
+    }
+    
+    /**
+     * tests the place() method when the selected location is 
+     * out of bounds with a positive X value. 
+     */
+    public void testPlaceOutOfBoundsWithPositiveX()
+    {
+        StudentBoard board = BoardUtilities.newBoard(StudentBoard.class, 
+            5, 5, 
+            "", 
+            "", 
+            "", 
+            "", 
+            ""
+            );
+        
+        Piece piece = Piece.getPiece(Piece.SQUARE, 0);
+        int result = board.place(piece, new Point(5, 0));
+        
+        assertThat(result).isEqualTo(Board.PLACE_OUT_BOUNDS);
+    }
+    
+    /**
+     * tests the place() method when the selected location is 
+     * out of bounds with a negative Y value. 
+     */
+    public void testPlaceOutOfBoundsWithNegativeY()
+    {
+        StudentBoard board = BoardUtilities.newBoard(StudentBoard.class, 
+            5, 5, 
+            "", 
+            "", 
+            "", 
+            "", 
+            ""
+            );
+        
+        Piece piece = Piece.getPiece(Piece.SQUARE, 0);
+        int result = board.place(piece, new Point(0, -1));
+        
+        assertThat(result).isEqualTo(Board.PLACE_OUT_BOUNDS);
+    }
+    
+    /**
+     * tests the place() method when the selected location is 
+     * out of bounds with a positive Y value. 
+     */
+    public void testPlaceOutOfBoundsWithPositiveY()
+    {
+        StudentBoard board = BoardUtilities.newBoard(StudentBoard.class, 
+            5, 5, 
+            "", 
+            "", 
+            "", 
+            "", 
+            ""
+            );
+        
+        Piece piece = Piece.getPiece(Piece.SQUARE, 0);
+        int result = board.place(piece, new Point(0, 5));
+        
+        assertThat(result).isEqualTo(Board.PLACE_OUT_BOUNDS);
+    }
+    
+    /**
+     * tests the place() method for a bad spot
+     */
+    public void testPlaceBad()
+    {
+        StudentBoard board = BoardUtilities.newBoard(StudentBoard.class,
+                6, 12,
+                "      ",
+                "      ",
+                "      ",
+                "      ",
+                "      ",
+                "      ",
+                "      ",
+                "      ",
+                "      ",
+                "      ",
+                "      ",
+                "OO OO "
+            );
+
+        Piece piece = Piece.getPiece(Piece.STICK, 0);
+        int result = board.place(piece, new Point(0, 0));
+
+        assertThat(result).isEqualTo(Board.PLACE_BAD);
+    }
+
+    /**
+     * tests the place() method for a filled row
+     */
+    public void testPlaceRowFilled()
+    {
+        StudentBoard board = BoardUtilities.newBoard(StudentBoard.class,
+                6, 12,
+                "######"
+            );
+
+        Piece piece = Piece.getPiece(Piece.STICK, 0);
+        int result = board.place(piece, new Point(1, 1));
+
+        assertThat(result).isEqualTo(Board.PLACE_ROW_FILLED);
+    }
+    
+    /**
+     * tests the place() method to test the Board.PLACE_OK statement
+     */
+    public void testPlaceOk()
+    {
+        StudentBoard board = BoardUtilities.newBoard(StudentBoard.class, 3, 2, 
+            "   ", 
+            "   ");
+
+        Piece piece = Piece.getPiece(Piece.SQUARE, 0);
+        Point location = new Point(1, 0);
+        int result = board.place(piece, location);
+
+        assertThat(result).isEqualTo(Board.PLACE_OK);   
+    }
+
+    /**
+     * tests the clearRows() method with an empty board 
+     */
+    public void testClearRowsWithEmptyBoard()
+    {
+        StudentBoard board = BoardUtilities.newBoard(StudentBoard.class, 3, 3,
+                "   ",
+                "   ",
+                "   "
+            );
+
+        boolean result = board.clearRows();
+
+        assertThat(result).isFalse();
+    }
+
+    /**
+     * tests the clearRows() method with no rows to clear 
+     */
+    public void testClearRowsWithNoRowsToClear()
+    {
+        StudentBoard board = BoardUtilities.newBoard(StudentBoard.class, 3, 3,
+                " X ",
+                "X X",
+                " X "
+            );
+
+        boolean result = board.clearRows();
+
+        assertThat(result).isFalse();
+    }
+
+    /**
+     * tests the clearRows() method with only one row to clear
+     */
+    public void testClearRowsWithOneRowToClear()
+    {
+        StudentBoard board = BoardUtilities.newBoard(StudentBoard.class, 3, 3,
+                "XXX",
+                " X ",
+                "X X"
+            );
+
+        boolean result = board.clearRows();
+
+        assertThat(result).isTrue();
+    }
+
+    /**
+     * tests the clearRows() method with multiple rows to clear
+     */
+    public void testClearRowsWithMultipleRowsToClear()
+    {
+        StudentBoard board = BoardUtilities.newBoard(StudentBoard.class, 3, 5,
+                "   ",
+                "XXX",
+                " X ",
+                "X X",
+                "XXX"
+            );
+
+        boolean result = board.clearRows();
+
+        assertThat(result).isTrue();
+    }
+}
