@@ -1,0 +1,25 @@
+/**
+ *  Application launcher for JTetris.
+ *
+ *  @author Stephen Edwards
+ *  @version 2021.10.28
+ */
+public class Application
+{
+    /**
+     * Initializes a newly created Application object.
+     */
+    public Application()
+    {
+        super();
+        Application.run();
+    }
+
+    /**
+     * Launches the JTetris graphical user interface to play the game.
+     */
+    public static void run()
+    {
+        student.tetris2.JTetris.main(null);
+    }
+}
